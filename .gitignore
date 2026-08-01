@@ -3,6 +3,11 @@ __pycache__/
 *.pyc
 .env
 .streamlit/
+
 models/
 data/
 *.pkl
+
+.vscode
+.DS_Store
+dist/

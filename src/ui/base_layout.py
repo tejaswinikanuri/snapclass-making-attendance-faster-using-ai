@@ -56,8 +56,8 @@ def style_base_layout():
                 font-family: 'Climate Crisis', sans-serif !important;
                 font-size: 2rem !important;
                 line-height: 1 !important;
-                margin-bottom: 0rem !important;
-                color: black !important;
+                margin-bottom: 0 !important;
+               
             }
 
             h3, h4, p {
@@ -65,7 +65,7 @@ def style_base_layout():
             }
 
             button[kind="primary"] {
-                background: #5865F2 !important;
+                background: #5865F2 !important; /* purple */
                 border-radius: 1.5rem !important;
                 color: white !important;
                 padding: 10px 20px !important;
@@ -74,7 +74,7 @@ def style_base_layout():
             }
 
             button[kind="secondary"] {
-                background: #EB459E !important;
+                background: #EB459E !important; /* pink */
                 border-radius: 1.5rem !important;
                 color: white !important;
                 padding: 10px 20px !important;
@@ -83,7 +83,7 @@ def style_base_layout():
             }
 
             button[kind="tertiary"] {
-                background: black !important;
+                background: black !important; /* black */
                 border-radius: 1.5rem !important;
                 color: white !important;
                 padding: 10px 20px !important;
