@@ -3,9 +3,9 @@ from src.components.footer import footer_dashboard, footer_home
 from src.components.header import header_dashboard
 from src.ui.base_layout import style_background_dashboard, style_base_layout
 from src.database.db import check_teacher_exists, create_teacher, teacher_login, get_teacher_subjects
-from components.dialog_create_subject import dialog_create_subject
+from src.components.dialog_create_subject import dialog_create_subject
 from src.components.subject_card import subject_card
-from components.dialog_share_subject import dialog_share_subject
+from src.components.dialog_share_subject import dialog_share_subject
 
 def teacher_screen():
     
@@ -19,6 +19,7 @@ def teacher_screen():
         teacher_screen_login()
     elif st.session_state.teacher_login_type=="register":
         teacher_screen_register()
+    footer_dashboard()
 
 def teacher_dashboard():
     teacher_data = st.session_state.teacher_data
@@ -70,7 +71,7 @@ def teacher_dashboard():
     if st.session_state.cur_teacher_tab == "attendance_records":
         teacher_tab_attendance_records()
 
-    footer_dashboard()
+
 
 
 def teacher_tab_take_attendance():
@@ -182,7 +183,7 @@ def teacher_screen_login():
         if st.button("Register Instead", type="primary", key="registerbtn", width="stretch", icon=":material/passkey:", icon_position='left'):
             st.session_state.teacher_login_type = "register"
 
-    footer_dashboard()
+
 
 
 
@@ -224,5 +225,3 @@ def teacher_screen_register():
         if st.button("Login Instead", key="loginbtn", icon=":material/passkey:", icon_position='left', width="stretch"):
             st.session_state.teacher_login_type = "login"
         
-
-    footer_dashboard()
