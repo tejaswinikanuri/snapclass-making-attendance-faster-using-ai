@@ -65,7 +65,7 @@ def style_base_layout():
             }
 
             button[kind="primary"] {
-                background: #5865F2 !important; /* purple */
+                background-color: #5865F2 !important; /* purple */
                 border-radius: 1.5rem !important;
                 color: white !important;
                 padding: 10px 20px !important;
@@ -74,7 +74,7 @@ def style_base_layout():
             }
 
             button[kind="secondary"] {
-                background: #EB459E !important; /* pink */
+                background-color: #EB459E !important; /* pink */
                 border-radius: 1.5rem !important;
                 color: white !important;
                 padding: 10px 20px !important;
@@ -83,7 +83,7 @@ def style_base_layout():
             }
 
             button[kind="tertiary"] {
-                background: black !important; /* black */
+                background-color: black !important; /* black */
                 border-radius: 1.5rem !important;
                 color: white !important;
                 padding: 10px 20px !important;

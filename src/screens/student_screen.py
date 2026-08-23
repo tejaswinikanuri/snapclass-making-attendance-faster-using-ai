@@ -47,7 +47,7 @@ def student_screen():
 
             if num_faces == 0:
                 st.warning("Face not found!")
-            elif num_faces == 0:
+            elif num_faces > 1:
                 st.warning("Multiple faces found!")
             else:
                 if detected:
@@ -71,7 +71,7 @@ def student_screen():
             with st.container(border=True):
                 st.header("Register New Profile")
                 new_name = st.text_input("Enter your name", placeholder="E.g. Tejaswini Kanuri")
-
+                #password = st.text_input("Password", type="password")
                 st.subheader("Optional: Voice Enrollment")
                 st.info("Enroll your voice for only attendance")
 

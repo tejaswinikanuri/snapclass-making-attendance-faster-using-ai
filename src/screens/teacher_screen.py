@@ -22,6 +22,43 @@ def teacher_dashboard():
     teacher_data = st.session_state.teacher_data
 
     st.header(f"""Welcome, {teacher_data['name']}""")
+    col1, col2 = st.columns(2, vertical_alignment='center', gap='xxlarge')
+     
+    with col1:
+        header_dashboard()
+
+    with col2:
+        if st.button("Logout", type='secondary', key='loginbackbtn', shortcut="control+backspace"):
+            st.session_state['login_type'] = None
+            st.session_state["is_logged_in"] = False
+            del st.session_state.teacher_data
+            st.rerun()
+    st.space()
+    tab1, tab2, tab3 = st.columns(3)
+
+
+    if 'cur_teacher_tab' not in st.session_state:
+        st.session_state.cur_teacher_tab = "take_attendance"
+
+    with tab1:
+        type1 = "primary" if st.session_state.cur_teacher_tab == "take_attendance" else "tertiary"
+        
+        st.button("Take Attendance", type=type1, width="stretch", icon=':material/ar_on_you:')
+        st.session_state.cur_teacher_tab = "take_attendance"
+        st.rerun()
+
+    with tab2:
+        type2 = "primary" if st.session_state.cur_teacher_tab == "take_attendance" else "tertiary"
+        st.button("Manage Subjects", type=type2, width="stretch", icon=':material/book_ribbon:')
+        st.session_state.cur_teacher_tab = "take_attendance"
+        st.rerun()
+
+    with tab3:
+        type3 = "primary" if st.session_state.cur_teacher_tab == "take_attendance" else "tertiary"
+        st.button("Attendance Records", type=type3, width="stretch", icon=':material/cards_stack:')
+        st.session_state.cur_teacher_tab = "take_attendance"
+        st.rerun()
+    footer_dashboard()
 
 def register_teacher(teacher_username, teacher_name,  teacher_pass, teacher_confirm_pass):
     if not teacher_username or not teacher_name or not teacher_pass:

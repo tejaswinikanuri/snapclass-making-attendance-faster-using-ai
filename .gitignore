@@ -1,13 +1,31 @@
+
+# Virtual Environments
 venv/
+venv310/
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+
+# Secrets
 .env
 .streamlit/
+.streamlit/secrets.toml
 
+# ML Models & Data
 models/
 data/
 *.pkl
+*.joblib
 
-.vscode
-.DS_Store
+# IDE
+.vscode/
+.idea/
+
+# Build files
 dist/
+build/
+
+# OS files
+.DS_Store

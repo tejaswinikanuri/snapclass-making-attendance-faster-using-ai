@@ -10,10 +10,10 @@ from src.database.db import get_all_students
 def load_dlib_models():
     detector = dlib.get_frontal_face_detector()
     sp = dlib.shape_predictor(
-        face_recognition_models.pos_predictor_model_location()
+        face_recognition_models.pose_predictor_model_location()
     )
     facerec = dlib.face_recognition_model_v1(
-        face_recognition_models.pos_predictor_model_location()
+        face_recognition_models.face_recognition_model_location()
     )
     return detector, sp, facerec
 
@@ -84,11 +84,11 @@ def predict_attendance(class_img_np):
             predicted_id = int(clf.predict([encoding]))[0]
         else:
             predicted_id = int(all_students[0])
-    student_embedding = X_train[y_train.index(predicted_id)]
+        student_embedding = X_train[y_train.index(predicted_id)]
 
-    best_match_score = np.linalg.norm(student_embedding - encoding)
-    resemblance_threshold = 0.6
+        best_match_score = np.linalg.norm(student_embedding - encoding)
+        resemblance_threshold = 0.6
 
-    if(best_match_score <= resemblance_threshold):
-        detected_student[predicted_id] = True
-    return detected_student, all_students, len(encoding)
+        if(best_match_score <= resemblance_threshold):
+            detected_student[predicted_id] = True
+    return detected_student, all_students, len(encodings)
