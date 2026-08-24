@@ -80,16 +80,14 @@ def student_dashboard():
     footer_dashboard()
 
 def student_screen():
-    
     style_background_dashboard()
     style_base_layout()
 
-    if "student_data" in st.session_state:
+    if st.session_state.get("is_logged_in", False):
         student_dashboard()
         return
 
     col1, col2 = st.columns(2, vertical_alignment='center', gap='xxlarge')
- 
     with col1:
         header_dashboard()
 
@@ -102,10 +100,12 @@ def student_screen():
     st.space()
     st.space()
 
-    show_registration = False
+    if "show_registration" not in st.session_state:
+        st.session_state.show_registration = False
+
     photo_source = st.camera_input("Position your face in the center")
 
-    if photo_source:
+    if photo_source and not st.session_state.show_registration:
         img = np.array(Image.open(photo_source))
 
         with st.spinner("AI is scanning..."):
@@ -116,63 +116,88 @@ def student_screen():
             elif num_faces > 1:
                 st.warning("Multiple faces found!")
             else:
+                student = None
                 if detected:
                     student_id = list(detected.keys())[0]
                     all_students = get_all_students()
-
                     student = next((s for s in all_students if s['student_id'] == student_id), None)
 
-                    if student:
-                        st.session_state.is_logged_in = True
-                        st.session_state.user_role = "student"
-                        st.session_state.student_data = student
-                        st.toast(f"Welcome Back! {student['name']}")
-                        time.sleep(1)
-                        st.rerun()
+                if student:
+                    st.session_state.is_logged_in = True
+                    st.session_state.user_role = "student"
+                    st.session_state.student_data = student
+                    st.toast(f"Welcome Back! {student['name']}")
+                    time.sleep(1)
+                    st.rerun()
                 else:
                     st.info("Face not recognised! You might be a new student!")
-                    show_registration = True
+                    st.session_state.show_registration = True
 
-        if show_registration:
-            with st.container(border=True):
-                st.header("Register New Profile")
-                new_name = st.text_input("Enter your name", placeholder="E.g. Tejaswini Kanuri")
-                #password = st.text_input("Password", type="password")
-                st.subheader("Optional: Voice Enrollment")
-                st.info("Enroll your voice for only attendance")
+    if st.session_state.show_registration:
+        with st.container(border=True):
+            st.header("Register New Profile")
+            new_name = st.text_input("Enter your name", placeholder="E.g. Tejaswini Kanuri")
+            st.subheader("Optional: Voice Enrollment")
+            st.info("Enroll your voice for only attendance")
 
-                audio_data = None
+            audio_data = None
+            try:
+                audio_data = st.audio_input("Record a short phrase like I am present, My name is Akash.")
+            except Exception as e:
+                st.error("Audio Data Failed!")
 
-                try:
-                    audio_data = st.audio_input("Record a short phrase like I am present, My name is Akash.")
-                except Exception as e:
-                    st.error("Audio Data Failed!")
+            # DEBUG: show widget state on every rerun, before any button click
+            print(f"[DEBUG] render pass -> audio_data is None: {audio_data is None}")
+            st.caption(f"🐛 DEBUG: audio_data = {audio_data!r}")
 
-                if st.button("Create Account", type="primary"):
-                    if new_name:
-                        with st.spinner("Creating profile.."):
-                            img = np.array(Image.open(photo_source))
-                            encodings = get_face_embeddings(img)
-                            if encodings:
-                                face_emb = encodings[0].tolist()
+            if st.button("Create Account", type="primary"):
+                print("[DEBUG] Create Account button clicked")
+                st.write("🐛 DEBUG: button clicked, new_name =", repr(new_name))
+                st.write("🐛 DEBUG: audio_data at click time =", repr(audio_data))
 
-                                voice_emb = None
-                                if audio_data:
-                                    voice_emb = get_voice_embedding(audio_data.read())
+                if new_name:
+                    with st.spinner("Creating profile.."):
+                        img = np.array(Image.open(photo_source))
+                        encodings = get_face_embeddings(img)
+                        print(f"[DEBUG] encodings found: {bool(encodings)}")
 
-                                response_data = create_student(new_name, face_embedding=face_emb, voice_embedding=voice_emb)
+                        if encodings:
+                            face_emb = encodings[0].tolist()
 
-                                if response_data:
-                                    train_classifier()
-                                    st.session_state.is_logged_in = True
-                                    st.session_state.user_role = "student"
-                                    st.session_state.student_data = response_data
-                                    st.toast(f"Profile Created! Hi {new_name}!")
-                                    time.sleep(1)
-                                    st.rerun()
+                            voice_emb = None
+                            if audio_data is not None:
+                                raw_bytes = audio_data.read()
+                                print(f"[DEBUG] audio bytes read, length = {len(raw_bytes)}")
+                                st.write(f"🐛 DEBUG: audio byte length = {len(raw_bytes)}")
+
+                                voice_emb = get_voice_embedding(raw_bytes)
+                                print(f"[DEBUG] voice_emb result: {'None' if voice_emb is None else f'list of len {len(voice_emb)}'}")
+                                st.write(f"🐛 DEBUG: voice_emb = {'None' if voice_emb is None else f'<{len(voice_emb)} floats>'}")
+
+                                if voice_emb is None:
+                                    st.warning("Couldn't process your voice sample — continuing without it.")
                             else:
-                                st.error("Couldn't capture your facial features for registration")
-                    else:
-                        st.warning("Please enter your name")
+                                print("[DEBUG] audio_data was None at click time — skipping voice pipeline entirely")
+                                st.info("No voice sample recorded — skipping voice enrollment.")
+
+                            st.write("🐛 DEBUG: about to call create_student with voice_embedding =",
+                                      "None" if voice_emb is None else f"<{len(voice_emb)} floats>")
+
+                            response_data = create_student(new_name, face_embedding=face_emb, voice_embedding=voice_emb)
+                            print(f"[DEBUG] create_student response: {response_data}")
+
+                            if response_data:
+                                train_classifier()
+                                st.session_state.is_logged_in = True
+                                st.session_state.user_role = "student"
+                                st.session_state.student_data = response_data[0]
+                                st.session_state.show_registration = False
+                                st.toast(f"Profile Created! Hi {new_name}!")
+                                time.sleep(1)
+                                st.rerun()
+                        else:
+                            st.error("Couldn't capture your facial features for registration")
+                else:
+                    st.warning("Please enter your name")
 
     footer_dashboard()

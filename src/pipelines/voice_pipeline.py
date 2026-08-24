@@ -11,21 +11,21 @@ def load_voice_encoder():
 def get_voice_embedding(audio_bytes):
     try:
         encoder = load_voice_encoder()
-        audio, sr = librosa.load(io.BytesIO(audio_bytes), src=16000)
+        audio, sr = librosa.load(io.BytesIO(audio_bytes), sr=16000)
         wav = preprocess_wav(audio)
         embedding = encoder.embed_utterance(wav)
         return embedding.tolist()
     except Exception as e:
-        st.error("Voice recognition error")
+        st.error(f"Voice recog error: {e}")
         return None
 
-def identify_speaker(new_embedding, candidates_dict, threshold=0.65):
-    if not new_embedding or not candidates_dict:
+def identify_speaker(new_embedding, candidates_dict, threshold=0.5):
+    if new_embedding is None or not candidates_dict:
         return None, 0.0
     best_sid = None
     best_score = -1.0
     for sid, stored_embedding in candidates_dict.items():
-        if stored_embedding:
+        if stored_embedding is not None: 
             similarity = np.dot(new_embedding, stored_embedding)
             if(similarity>best_score):
                 best_score = similarity
@@ -34,10 +34,10 @@ def identify_speaker(new_embedding, candidates_dict, threshold=0.65):
         return best_sid, best_score
     return None, best_score
 
-def process_bulk_audio(audio_bytes, candidates_dict, threshold=0.65):
+def process_bulk_audio(audio_bytes, candidates_dict, threshold=0.5):
     try:
-        encoder = VoiceEncoder()
-        audio, sr = librosa.load(io.BytesIO(audio_bytes), src=16000)
+        encoder = load_voice_encoder()
+        audio, sr = librosa.load(io.BytesIO(audio_bytes), sr=16000)
         segments = librosa.effects.split(audio, top_db=30)
 
         identified_results = {}
